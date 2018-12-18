@@ -81,9 +81,9 @@ def exclusive_groups(user_groups_list, friends_groups_list):
 
     user_groups_set = set(user_groups_list)
     friends_groups_set = set(friends_groups_list)
-    exclusive_groups_set = friends_groups_set.difference(user_groups_set)
+    exclusive_groups_set = user_groups_set.difference(friends_groups_set)
 
-    print('Группы друзей, в которых нет пользователя: ', exclusive_groups_set)
+    print('Группы друзей, в которых есть пользователь, но нет друзей: ', exclusive_groups_set)
     return exclusive_groups_set
 
 
