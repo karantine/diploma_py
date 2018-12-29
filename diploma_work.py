@@ -3,9 +3,7 @@ import requests
 
 def get_num_id(id):
 
-    if id.isdigit():
-        id = id
-    else:
+    if not id.isdigit():
         params = {
             'access_token': token,
             'v': '5.92',
@@ -14,7 +12,6 @@ def get_num_id(id):
         id_res = requests.get('https://api.vk.com/method/users.get', params)
         id = id_res.json()['response'][0]['id']
     return id
-
 
 def get_user_friends():
 
@@ -52,13 +49,12 @@ def get_user_groups():
 
 def friends_groups(friends_list):
 
+    friends_groups_list = []
+
     for friend in friends_list:
-
-        # friends_groups_list = []
-
         params = {
             'access_token': token,
-            'user_id': friends_list,
+            'user_id': friend,
             # 'extended': 1,
             # 'fields': 'members_count', #лучше потом getByID
             'v': '5.92'
@@ -67,15 +63,14 @@ def friends_groups(friends_list):
         try:
 
             response = requests.get('https://api.vk.com/method/groups.get', params)
-            friends_groups_list = response.json()['response']['items']
-            # friends_groups_list.append(friend_groups_list) # все равно только один друг обрабатывается
-
-            print('Группы друзей: ', friends_groups_list)
-            return friends_groups_list
+            temp = response.json()['response']['items']
+            friends_groups_list = friends_groups_list + temp
 
         except KeyError:
             print('KeyError')
 
+    print('Группы друзей: ', friends_groups_list)
+    return friends_groups_list
 
 def exclusive_groups(user_groups_list, friends_groups_list):
 
@@ -90,22 +85,19 @@ def exclusive_groups(user_groups_list, friends_groups_list):
 def get_groups_info(exclusive_groups_set):
 
     group_fields = ['name', 'id', 'members_count']
+    
+    groups_string = [str(s) for s in exclusive_groups_set]
 
     params = {
         'access_token': token,
-        'group_ids': exclusive_groups_set,
-        'fields': group_fields,
+        'group_ids': ','.join(groups_string),
+        'fields': ','.join(group_fields),
         'v': '5.92'
     }
 
     response = requests.get('https://api.vk.com/method/groups.getById', params)
-    groups_info = {
-        'name': response.json()[response][group_fields[0]],
-        'gid': response.json()[response][group_fields[1]],
-        'members_count': response.json()[response][group_fields[2]]
-    }
 
-    # groups_info = response.json()['response']['items']
+    groups_info = response.json()['response']
 
     print(groups_info)
     return groups_info
@@ -120,3 +112,7 @@ if __name__ == '__main__':
     friends_groups_list = friends_groups(friends_list)
     exclusive_groups_set = exclusive_groups(user_groups_list, friends_groups_list)
     groups_info = get_groups_info(exclusive_groups_set)
+
+a = ['{"name": "%s","gid": "%s","members_count": %d }' % (g['name'],g['id'],g['members_count']) for g in groups_info]
+print ('--------------------')
+print (','.join(a))
