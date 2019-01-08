@@ -1,4 +1,5 @@
 import requests
+import time
 
 
 class User:
@@ -11,6 +12,7 @@ class User:
                 'user_ids': user_id
             }
             id_res = requests.get('https://api.vk.com/method/users.get', params)
+            time.sleep(0.33)
             user_id = id_res.json()['response'][0]['id']
         print('-')
         return user_id
@@ -22,6 +24,7 @@ class User:
             'user_ids': user_id
         }
         status = requests.get('https://api.vk.com/method/users.get', params)
+        time.sleep(0.33)
         if_is_closed = status.json()['response'][0]['is_closed']
         print('-')
         return if_is_closed
@@ -35,6 +38,7 @@ class User:
         try:
 
             friends = requests.get('https://api.vk.com/method/friends.get', params)
+            time.sleep(0.33)
             friends_list = friends.json()['response']['items']
 
         except KeyError:
@@ -53,6 +57,7 @@ class User:
         try:
 
             user_groups = requests.get('https://api.vk.com/method/groups.get', params)
+            time.sleep(0.33)
             user_groups_list = user_groups.json()['response']['items']
 
         except KeyError:
@@ -74,6 +79,7 @@ class User:
             try:
 
                 response = requests.get('https://api.vk.com/method/groups.get', params)
+                time.sleep(0.33)
                 temp = response.json()['response']['items']
                 friends_groups_list = friends_groups_list + temp
 
@@ -150,3 +156,4 @@ if __name__ == '__main__':
     token = 'ed1271af9e8883f7a7c2cefbfddfcbc61563029666c487b2f71a5227cce0d1b533c4af4c5b888633c06ae'
     user = User()
     user.api_call()
+
