@@ -19,7 +19,9 @@ class User:
                 response = requests.get(url, request_parameters)
                 response_json = response.json()
                 response = response_json['response']
-            except KeyError:
+                time.sleep(0.33)
+                break
+            except:
                 print("Не удалось получить ответ от АПИ, всего попыток: %s." % i)
                 if 'error' in response_json.keys():
                     response = response_json['error']['error_msg']
