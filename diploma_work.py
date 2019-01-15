@@ -1,6 +1,7 @@
 import requests
 import time
 
+
 TOKEN = 'ed1271af9e8883f7a7c2cefbfddfcbc61563029666c487b2f71a5227cce0d1b533c4af4c5b888633c06ae'
 
 
@@ -10,28 +11,33 @@ class User:
         self.token = token
 
     def _request_get(self, url, request_parameters, number_of_attempts=3):
+        response = None
         if 'access_token' not in request_parameters.keys():
             request_parameters['access_token'] = self.token
         for i in range(number_of_attempts):
             try:
                 response = requests.get(url, request_parameters)
                 response_json = response.json()
-                return response_json['response']
+                response = response_json['response']
             except KeyError:
                 print("Не удалось получить ответ от АПИ, всего попыток: %s." % i)
                 if 'error' in response_json.keys():
-                    print(response_json['error']['error_msg'])
-                    return response_json['error']['error_msg']
+                    response = response_json['error']['error_msg']
+                    print(response)
                 time.sleep(1)
+        return response
 
     def get_num_id(self, user_id):
         if not user_id.isdigit():
-            params = {
-                'v': '5.92',
-                'user_ids': user_id
-            }
-            id_res = self._request_get('https://api.vk.com/method/users.get', params)
-            user_id = int(id_res[0]['id'])
+            try:
+                params = {
+                    'v': '5.92',
+                    'user_ids': user_id
+                }
+                id_res = self._request_get('https://api.vk.com/method/users.get', params)
+                user_id = int(id_res[0]['id'])
+            except KeyError:
+                print('Пользователь не найден')
         print('Проверяем ID пользователя')
         return user_id
 
