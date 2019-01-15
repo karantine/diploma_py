@@ -10,23 +10,20 @@ class User:
     def __init__(self, token):
         self.token = token
 
-    def _request_get(self, url, request_parameters, number_of_attempts=3):
+    def _request_get(self, url, request_parameters):
         response = None
         if 'access_token' not in request_parameters.keys():
             request_parameters['access_token'] = self.token
-        for i in range(number_of_attempts):
-            try:
-                response = requests.get(url, request_parameters)
-                response_json = response.json()
-                response = response_json['response']
-                time.sleep(0.33)
-                break
-            except:
-                print("Не удалось получить ответ от АПИ, всего попыток: %s." % i)
-                if 'error' in response_json.keys():
-                    response = response_json['error']['error_msg']
-                    print(response)
-                time.sleep(1)
+        try:
+            response = requests.get(url, request_parameters)
+            response_json = response.json()
+            response = response_json['response']
+        except KeyError:
+            print("Не удалось получить ответ от АПИ")
+            if 'error' in response_json.keys():
+                response = response_json['error']['error_msg']
+                print(response)
+        time.sleep(0.33)
         return response
 
     def get_num_id(self, user_id):
